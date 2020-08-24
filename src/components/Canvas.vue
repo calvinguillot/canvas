@@ -1,51 +1,82 @@
 <template>
-  <v-container fluid class="pa-0" style="background:white; height: 100vh;">
-    <v-row justify-center align-center style="height: 100vh; overflow: hidden;">
-      <v-row align-center>
-        <canvas id="c1" :width="wWidth" :height="wHeight"></canvas>
-        <v-row class="panelPOS">
-          <v-row>
-            <v-col cols="12">
-              <v-btn fab @click="brushSize(5)" class="my-3 mx-4" style=" height: 10px;width: 10px;"></v-btn>
-              <v-btn
-                fab
-                @click="brushSize(10)"
-                class="mb-3 mx-4"
-                style=" height: 17px;width: 17px;"
-              ></v-btn>
-              <v-btn
-                fab
-                @click="brushSize(20)"
-                class="mb-3 mx-4"
-                style=" height: 25px;width: 25px;"
-              ></v-btn>
-            </v-col>
-            <v-col cols="12">
-              <v-btn
-                v-for="(colour, index) in colours"
-                :key="colour"
-                fab
-                class="ma-1"
-                style=" height: 25px;width: 25px;"
-                :color="coloursBTN[index]"
-                @click="brushColour(colours[index])"
-              ></v-btn>
-            </v-col>
-            <v-col cols="12" class="mt-3">
-              <v-btn fab text class="my-0" color="white" @click="clearCanvas">
-                <v-icon>mdi-close</v-icon>
-              </v-btn>
-              <v-btn fab text class="my-0" color="white" @click="undoDraw">
-                <v-icon>mdi-replay</v-icon>
-              </v-btn>
-              <v-btn fab text class="my-0" color="white" @click="saveImage">
-                <v-icon>mdi-download</v-icon>
-              </v-btn>
-            </v-col>
-          </v-row>
+  <v-container fluid class="pa-0 ma-0" style="background:white; height: 100vh;">
+    <canvas id="c1" :width="wWidth" :height="wHeight"></canvas>
+    <v-row style="z-index:999">
+      <v-col cols="6" sm="3" md="2">
+        <v-row class="ml-1 mt-3">
+          <v-col class="pb-0" elevation="15">
+            <v-slider
+              v-model="size"
+              color="black"
+              :thumb-size="24"
+              thumb-label="always"
+              track-color="grey lighten-3"
+              min="0"
+              max="30"
+            ></v-slider>
+          </v-col>
+          <v-col class="pt-0">
+            <v-color-picker v-model="colour" elevation="10" hide-inputs></v-color-picker>
+          </v-col>
+          <v-col class="pt-0">
+            <v-row>
+              <v-col v-for="button in buttons" :key="button.icon" cols="4" align="center">
+                <v-btn
+                  x-small
+                  fab
+                  text
+                  color="black"
+                  elevation="10"
+                  @click="actions(button.function)"
+                >
+                  <v-icon>{{button.icon}}</v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-col>
         </v-row>
-      </v-row>
+      </v-col>
     </v-row>
+
+    <!-- <v-row no-gutters class="panelPOS">
+      <v-row justify="space-around" align="center">
+        <v-col cols="4">
+          <v-btn fab @click="brushSize(5)" class="my-3 mx-4" style=" height: 10px;width: 10px;"></v-btn>
+        </v-col>
+        <v-col cols="4">
+          <v-btn fab @click="brushSize(10)" class="mb-3 mx-4" style=" height: 17px;width: 17px;"></v-btn>
+        </v-col>
+        <v-col cols="4">
+          <v-btn fab @click="brushSize(20)" class="mb-3 mx-4" style=" height: 25px;width: 25px;"></v-btn>
+        </v-col>
+      </v-row>
+      <v-col cols="1">
+        <v-slider color="grey" vertical :thumb-size="24" thumb-label="always" min="0" max="30"></v-slider>
+      </v-col>
+
+      <v-col cols="12">
+        <v-btn
+          v-for="(colour, index) in colours"
+          :key="colour"
+          fab
+          class="ma-1"
+          style=" height: 25px;width: 25px;"
+          :color="coloursBTN[index]"
+          @click="brushColour(colours[index])"
+        ></v-btn>
+      </v-col>
+      <v-col cols="12" class="mt-3">
+        <v-btn fab text class="my-0" color="white" @click="clearCanvas">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+        <v-btn fab text class="my-0" color="white" @click="undoDraw">
+          <v-icon>mdi-replay</v-icon>
+        </v-btn>
+        <v-btn fab text class="my-0" color="white" @click="saveImage">
+          <v-icon>mdi-download</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>-->
   </v-container>
 </template>
 
@@ -59,49 +90,65 @@ export default {
       wHeight: null,
       wWidth: null,
       brushCursor: null,
-      colours: [
-        "#2ECC71",
-        "#3498db",
-        "#9b59b6",
-        "#f1c40f",
-        "#e67e22",
-        "#e74c3c",
-        "#000000",
-        "#ffffff",
+      colour: null,
+      size: null,
+      buttons: [
+        { icon: "mdi-close", function: "clear" },
+        { icon: "mdi-replay", function: "undo" },
+        { icon: "mdi-download", function: "save" },
       ],
-      coloursBTN: [
-        "green",
-        "blue",
-        "purple",
-        "yellow",
-        "orange",
-        "red",
-        "black",
-        "white",
-      ],
+      // colours: [
+      //   "#2ECC71",
+      //   "#3498db",
+      //   "#9b59b6",
+      //   "#f1c40f",
+      //   "#e67e22",
+      //   "#e74c3c",
+      //   "#000000",
+      //   "#ffffff",
+      // ],
+      // coloursBTN: [
+      //   "green",
+      //   "blue",
+      //   "purple",
+      //   "yellow",
+      //   "orange",
+      //   "red",
+      //   "black",
+      //   "white",
+      // ],
     };
   },
   methods: {
+    actions(e) {
+      if (e === "clear") {
+        this.clearCanvas();
+      } else if (e === "undo") {
+        this.undoDraw();
+      } else if (e === "save") {
+        this.saveImage();
+      }
+    },
     clearCanvas() {
       this.canvas.clear().renderAll();
     },
-    brushSize(e) {
-      this.canvas.freeDrawingBrush.width = e;
-      this.brushCursor
-        .set({ radius: e / 2 })
-        .setCoords()
-        .canvas.renderAll();
-    },
-    brushColour(e) {
-      // console.log(e)
-      this.canvas.freeDrawingBrush.color = e;
-      this.brushCursor
-        .set({
-          fill: e,
-        })
-        .setCoords()
-        .canvas.renderAll();
-    },
+    // brushSize(e) {
+    //   this.canvas.freeDrawingBrush.width = e;
+    //   this.brushCursor
+    //     .set({ radius: e / 2 })
+    //     .setCoords()
+    //     .canvas.renderAll();
+    // },
+    // brushColour(e) {
+    //   // console.log(e)
+    //   this.canvas.freeDrawingBrush.color = e;
+    //   this.brushCursor
+    //     .set({
+    //       fill: e,
+    //     })
+    //     .setCoords()
+    //     .canvas.renderAll();
+    // },
     undoDraw() {
       let objects = this.canvas.getObjects();
       if (objects.length > 1) {
@@ -117,6 +164,24 @@ export default {
       a.setAttribute("download", "I made this");
       a.click();
     },
+  },
+  updated(){
+// Brush Size
+    this.canvas.freeDrawingBrush.width = this.size;
+      this.brushCursor
+        .set({ radius: this.size / 2 })
+        .setCoords()
+        .canvas.renderAll();
+// Brush Colour
+ this.canvas.freeDrawingBrush.color = this.colour.hexa;
+      this.brushCursor
+        .set({
+          fill: this.colour.hexa,
+        })
+        .setCoords()
+        .canvas.renderAll();
+
+
   },
   mounted() {
     this.canvas = new fabric.Canvas("c1");
@@ -151,12 +216,16 @@ export default {
   display: none;
 }
 
+body {
+  overflow: hidden;
+}
+
 .panelPOS {
   position: absolute;
   top: 100px;
   left: 0px;
-  height: 450px;
-  width: 75px;
+  /* height: 450px; */
+  /* width: 75px; */
   background-color: #424242;
   border-radius: 0px 20px 20px 0px;
 }

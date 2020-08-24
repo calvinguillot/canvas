@@ -1,5 +1,5 @@
 <template>
-  <v-app> 
+  <v-app>
     <v-main>
       <Canvas />
     </v-main>
@@ -18,5 +18,8 @@ export default {
   data: () => ({
     //
   }),
+  created() {
+    this.$vuetify.theme.dark = true;
+  },
 };
 </script>
